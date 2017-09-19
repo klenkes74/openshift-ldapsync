@@ -1,0 +1,22 @@
+---
+kind: ClusterRole
+apiVersion: 1
+metadata:
+  name: ldapsync
+  annotations:
+    openshift.io/description: Role for the AD Synchronization
+rules:
+- apiGroups:
+  - user.openshift.io
+  - ""
+  resources:
+  - groups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  attributeRestrictions: null

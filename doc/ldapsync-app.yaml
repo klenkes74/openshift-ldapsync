@@ -1,0 +1,98 @@
+---
+kind: List
+apiVersion: v1
+items:
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: ldap-sync
+    labels:
+      app: ldap-sync
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ldap-sync:latest
+    runPolicy: Serial
+    strategy:
+      from:
+        kind: ImageStreamTag
+        name: redhat-openjdk18-openshift:1.1
+        namespace: openshift
+    type: Source
+    source:
+      type: git
+      git:
+        ref: master
+        uri: https://github.com/klenkes74/openshift-ldapsync.git
+    triggers:
+    - type: ImageChange
+    - type: ConfigChange
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: ldap-sync
+    labels:
+      app: ldap-sync
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: ldap-sync
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels: ldap-sync
+        deploymentconfig: ldap-sync
+      spec:
+        securityContext: {}
+        serviceAccount: ldap-sync
+        serviceAccountName: ldap-sync
+        automountServiceAccountToken: true
+        restartPolic: Always
+        containers:
+        - name: ldap-sync
+          imagePulPolicy: Always
+          image: docker-registry.default.svc:5000/cloudmgmt/ldap-sync
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "1024Mi"
+            requests:
+              cpu: "50m"
+              memory: "768Mi"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: GROUPSYNC_LDAP_USER
+            valueFrom:
+              secretKeyRef:
+                name: ldap-sync-ldapcredentials
+                key: username
+          - name: GROUPSYNC_LDAP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ldap-sync-ldapcredentials
+                key: password
+          - name: GROUPSYNC_LDAP_SERVER
+            value: ###server###
+          - name: GROUPSYNC_LDAP_BASEDN
+            value: ###baseDN for groups###
+          - name: OCP_MASTER_SERVICE_HOST
+            value: ###masterUrl###
+          - name: OCP_MASTER_SERVICE_PORT
+            value: "443"
+  test: false
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    automatic: true
+    containerNames:
+    - ldap-sync
+    from:
+      kind: ImageStreamTag
+      name: ldap-sync:latest
+      namespace: cloudmgmt

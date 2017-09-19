@@ -1,0 +1,3 @@
+#JAVA_APP_JAR=openshift-ldapsync-1.0.0-SNAPSHOT.jar
+MAVEN_CLEAR_REPO=true
+AB_JOLOKIA_OFF=true

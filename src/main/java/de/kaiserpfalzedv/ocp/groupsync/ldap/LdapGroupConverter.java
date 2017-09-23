@@ -43,7 +43,7 @@ import org.springframework.stereotype.Service;
 public class LdapGroupConverter implements GroupConverter {
     private static final Logger LOG = LoggerFactory.getLogger(LdapGroupConverter.class);
 
-    private static final String OCP_GROUP_NAME_ATTRIBUTE = "name";
+    private static final String OCP_GROUP_NAME_ATTRIBUTE = "cn";
     private static final String MEMBER_ATTRIBUTE = "member";
 
     private LdapServer server;

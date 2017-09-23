@@ -16,15 +16,11 @@
 
 package de.kaiserpfalzedv.ocp.groupsync.ocp.actions;
 
-import java.net.URI;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
-import de.kaiserpfalzedv.ocp.groupsync.ocp.providers.ServerCredentials;
+import javax.validation.constraints.NotNull;
 
 import de.kaiserpfalzedv.ocp.groupsync.ExecuterException;
 import de.kaiserpfalzedv.ocp.groupsync.ocp.providers.OcpToken;
@@ -35,8 +31,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -63,7 +57,8 @@ public class ExecuteRestCall {
     public void init() {
         if ("-".equals(masterUrl)) {
             masterUrl = "https://"
-                + System.getenv("OCP_MASTER_SERVICE_HOST");
+                + System.getenv("OCP_MASTER_SERVICE_HOST")
+                + ":" + System.getenv("OCP_MASTER_SERVICE_PORT");
         }
     }
 

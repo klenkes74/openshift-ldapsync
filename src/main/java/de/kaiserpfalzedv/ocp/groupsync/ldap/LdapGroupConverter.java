@@ -61,7 +61,7 @@ public class LdapGroupConverter implements GroupConverter {
 
     @Override
     public Optional<Group> convert(final String dn, final Attributes ldapGroup) throws NamingException {
-        LOG.debug("Working on LDAP group: {}", dn);
+        LOG.info("Working on LDAP group: {}", dn);
         GroupBuilder builder = new GroupBuilder()
                 .withDn(dn)
                 .withLdapServer(server.getName())

@@ -111,10 +111,10 @@ public class LdapGroupConverter implements GroupConverter {
     }
 
     private boolean isGroup(final Attributes entry) {
-        return !isUser(entry);
+        return entry.get("objectClass").contains("groupOfNames");
     }
 
     private boolean isUser(final Attributes entry) {
-        return entry.get("objectClass").contains("person");
+        return !isGroup(entry);
     }
 }

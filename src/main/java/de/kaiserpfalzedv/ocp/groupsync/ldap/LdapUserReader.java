@@ -57,7 +57,7 @@ public class LdapUserReader {
         try {
             Attributes entry = server.getByDn(dn);
 
-            return converter.convert(entry);
+            return converter.convert(dn, entry);
         } catch (NamingException e) {
             LOG.error(e.getClass().getSimpleName() + " caught: " + e.getMessage(), e);
 

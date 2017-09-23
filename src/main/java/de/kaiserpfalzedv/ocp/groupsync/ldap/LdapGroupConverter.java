@@ -43,7 +43,6 @@ import org.springframework.stereotype.Service;
 public class LdapGroupConverter implements GroupConverter {
     private static final Logger LOG = LoggerFactory.getLogger(LdapGroupConverter.class);
 
-    private static final String DN_ATTRIBUTE = "distinguishedName";
     private static final String OCP_GROUP_NAME_ATTRIBUTE = "name";
     private static final String MEMBER_ATTRIBUTE = "member";
 
@@ -61,8 +60,7 @@ public class LdapGroupConverter implements GroupConverter {
     }
 
     @Override
-    public Optional<Group> convert(final Attributes ldapGroup) throws NamingException {
-        String dn = (String)ldapGroup.get(DN_ATTRIBUTE).get();
+    public Optional<Group> convert(final String dn, final Attributes ldapGroup) throws NamingException {
         LOG.debug("Working on LDAP group: {}", dn);
         GroupBuilder builder = new GroupBuilder()
                 .withDn(dn)
@@ -83,11 +81,11 @@ public class LdapGroupConverter implements GroupConverter {
 
                 if (isUser(memberEntry)) {
                     LOG.trace("Member is an user: dn={}", memberDn);
-                    Optional<User> memberUser = userConverter.convert(memberEntry);
+                    Optional<User> memberUser = userConverter.convert(memberDn, memberEntry);
                     memberUser.ifPresent(builder::addUser);
                 } else { /* need to load the new group data ... */
                     LOG.trace("Member is a group: dn={}", memberDn);
-                    Optional<Group> memberGroup = convert(memberEntry);
+                    Optional<Group> memberGroup = convert(memberDn, memberEntry);
                     memberGroup.ifPresent(builder::addGroup);
                 }
             }

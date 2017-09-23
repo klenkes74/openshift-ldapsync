@@ -20,13 +20,11 @@ import java.util.Optional;
 
 import javax.naming.directory.Attributes;
 
-import de.kaiserpfalzedv.ocp.groupsync.groups.User;
-
 /**
  * @author klenkes {@literal <rlichti@kaiserpfalz-edv.de>}
  * @version 1.0.0
  * @since 2017-09-10
  */
 public interface UserConverter {
-    Optional<User> convert(final Attributes entry);
+    Optional<User> convert(final String dn, final Attributes entry);
 }

@@ -38,18 +38,14 @@ import org.springframework.stereotype.Service;
 public class LdapUserConverter implements UserConverter {
     private static final Logger LOG = LoggerFactory.getLogger(LdapUserConverter.class);
 
-    private static final String DN_ATTRIBUTE = "distinguishedName";
-    private static final String USER_NAME_ATTRIBUTE = "sAMAccountName";
+    private static final String USER_NAME_ATTRIBUTE = "mail";
     private static final String FULL_NAME_ATTRIBUTE = "cn";
     private static final String EMAIL_ATTRIBUTE = "mail";
 
 
     @Override
-    public Optional<User> convert(final Attributes entry) {
+    public Optional<User> convert(final String dn, final Attributes entry) {
         try {
-            String dn = (String)entry.get(DN_ATTRIBUTE).get();
-            LOG.debug("Working on LDAP user: {}", dn);
-
             UserBuilder result = new UserBuilder()
                     .withDn(dn)
                     .withUserName(calculateUserName(entry));
@@ -70,7 +66,7 @@ public class LdapUserConverter implements UserConverter {
                 LOG.debug("Converted user: dn={}, user={}", dn, result.build());
             }
             return Optional.of(result.build());
-        } catch (IllegalStateException | IllegalArgumentException | NamingException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             LOG.error("Could not convert user from AD: {}", e.getMessage());
             return Optional.empty();
         }

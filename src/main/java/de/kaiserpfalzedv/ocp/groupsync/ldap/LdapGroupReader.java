@@ -70,6 +70,7 @@ public class LdapGroupReader {
             SearchResult ldapGroup = ldapGroups.nextElement();
 
             try {
+                LOG.trace("Working on: name={}, nameInNamespace={}, attributes={}", ldapGroup.getName(), ldapGroup.getNameInNamespace(), ldapGroup.getAttributes().getIDs());
                 Optional<Group> group = converter.convert(ldapGroup.getName(), ldapGroup.getAttributes());
 
                 group.ifPresent(g -> result.put(g.getOcpName(), g));

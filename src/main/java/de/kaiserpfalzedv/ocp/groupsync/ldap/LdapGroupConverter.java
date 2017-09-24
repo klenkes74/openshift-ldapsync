@@ -45,6 +45,7 @@ public class LdapGroupConverter implements GroupConverter {
 
     private static final String OCP_GROUP_NAME_ATTRIBUTE = "cn";
     private static final String MEMBER_ATTRIBUTE = "member";
+    private static final String[] GROUP_OBJECT_CLASSES = {"groupOfNames", "posixGroup", "group"};
 
     private LdapServer server;
     private UserConverter userConverter;
@@ -111,7 +112,12 @@ public class LdapGroupConverter implements GroupConverter {
     }
 
     private boolean isGroup(final Attributes entry) {
-        return entry.get("objectClass").contains("groupOfNames");
+        boolean result = false;
+        for (String objectClass : GROUP_OBJECT_CLASSES) {
+            result |= entry.get("objectClass").contains(objectClass);
+        }
+
+        return result;
     }
 
     private boolean isUser(final Attributes entry) {

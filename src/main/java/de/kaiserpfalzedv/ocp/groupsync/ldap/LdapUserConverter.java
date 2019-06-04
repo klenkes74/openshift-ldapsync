@@ -27,6 +27,7 @@ import de.kaiserpfalzedv.ocp.groupsync.groups.UserBuilder;
 import de.kaiserpfalzedv.ocp.groupsync.groups.UserConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,10 +39,14 @@ import org.springframework.stereotype.Service;
 public class LdapUserConverter implements UserConverter {
     private static final Logger LOG = LoggerFactory.getLogger(LdapUserConverter.class);
 
-    private static final String USER_NAME_ATTRIBUTE = "mail";
-    private static final String FULL_NAME_ATTRIBUTE = "cn";
-    private static final String EMAIL_ATTRIBUTE = "mail";
+    @Value("${ldapUserNameAttribute:mail}")
+    private String userNameAttribute;
 
+    @Value("${ldapFullNameAttribute:cn}")
+    private String fullNameAttribute;
+
+    @Value("${ldapEmailAttribute:mail}")
+    private String emailAttribute;
 
     @Override
     public Optional<User> convert(final String dn, final Attributes entry) {
@@ -51,14 +56,14 @@ public class LdapUserConverter implements UserConverter {
                     .withUserName(calculateUserName(entry));
 
             try {
-                result.withFullName(convert(FULL_NAME_ATTRIBUTE, entry.get(FULL_NAME_ATTRIBUTE)));
+                result.withFullName(convert(fullNameAttribute, entry.get(fullNameAttribute)));
             } catch (IllegalArgumentException e) {
-                LOG.warn("User does not have valid full name: dn={}, missing attribute={}", dn, FULL_NAME_ATTRIBUTE);
+                LOG.warn("User does not have valid full name: dn={}, missing attribute={}", dn, fullNameAttribute);
             }
             try {
-                result.withEmail(convert(EMAIL_ATTRIBUTE, entry.get(EMAIL_ATTRIBUTE)));
+                result.withEmail(convert(emailAttribute, entry.get(emailAttribute)));
             } catch (IllegalArgumentException e) {
-                LOG.warn("User does not have valid email: dn={}, missing attribute={}", dn, EMAIL_ATTRIBUTE);
+                LOG.warn("User does not have valid email: dn={}, missing attribute={}", dn, emailAttribute);
             }
 
 
@@ -73,7 +78,7 @@ public class LdapUserConverter implements UserConverter {
     }
 
     private String calculateUserName(Attributes entry) {
-        String ldapName = convert(USER_NAME_ATTRIBUTE, entry.get(USER_NAME_ATTRIBUTE));
+        String ldapName = convert(userNameAttribute, entry.get(userNameAttribute));
         String result = ldapName.toLowerCase();
 
         LOG.trace("Login generated for: ldapName={}, login={}", ldapName, result);
